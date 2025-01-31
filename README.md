@@ -1,5 +1,6 @@
 # Advanced calculator
 **Here's an advanced calculator with extra operations**
+![hippo](https://media3.giphy.com/media/aUovxH8Vf9qDu/giphy.gif)
 ![calculator](https://github.com/user-attachments/assets/a366df2a-e664-4a7b-838d-f5d9030ae0c7)
 - [Demo Project](https://nima-frontend.github.io/advanced-calculator/)
 - Developed by Nima Pourdad
