@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0e0e0e;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%; 
+            max-width: 300px;
+            height: 90%;
+            max-height: 410px;
+            padding: 1rem;
+            border-radius: 10px;
+            background-color: #272727;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header {
+            text-align: center;
+
+            h1 {
+                color: #666;
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            input {
+                width: 100%;
+                height: 40px;
+                padding: 0.5rem;
+                font-size: 1.2rem;
+                border-radius: 8px;
+                text-align: right;
+                background-color: #272727;
+                color: #666;
+                border: 1px solid #555;
+            }
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            button {
+                width: 22%;
+                height: 50px;
+                font-size: 0.9rem;
+                border-radius: 10%;
+                font-weight: bold;
+                background-color: #333;
+                color: #666;
+                border: 1px solid #555;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #444;
+                }
+
+                &.equals {
+                    width: 46%;
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="header">
+            <h1>Calculator</h1>
+            <input type="text" id="display" placeholder="0">
+        </section>
+        <section class="buttons">
+            <!-- Row 1 -->
+            <button onclick="getNumber(7)">7</button>
+            <button onclick="getNumber(8)">8</button>
+            <button onclick="getNumber(9)">9</button>
+            <button onclick="getOperator('+')">+</button>
+
+            <!-- Row 2 -->
+            <button onclick="getNumber(4)">4</button>
+            <button onclick="getNumber(5)">5</button>
+            <button onclick="getNumber(6)">6</button>
+            <button onclick="getOperator('-')">-</button>
+
+            <!-- Row 3 -->
+            <button onclick="getNumber(1)">1</button>
+            <button onclick="getNumber(2)">2</button>
+            <button onclick="getNumber(3)">3</button>
+            <button onclick="getOperator('*')">*</button>
+
+            <!-- Row 4 -->
+            <button onclick="clearDisplay()">CD</button>
+            <button onclick="deleteLast()">DEL</button>
+            <button onclick="getNumber(0)">0</button>
+            <button onclick="getOperator('/')">/</button>
+
+            <!-- Row 5 -->
+            <button onclick="calculateResult()" class="equals">=</button>
+            <button onclick="insertPower()">^</button>
+            <button onclick="insertSqrt()">√</button>
+        </section>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentNumber = ''; 
+        let previousNumber = null; 
+        let operator = null; 
+        let newEntry = false;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            display.value = ''; 
+            display.focus(); 
+        });
+        
+        function getNumber(num) {
+            if (newEntry) {
+                currentNumber = num.toString(); 
+                newEntry = false;
+            } else {
+                currentNumber += num.toString();
+            }
+            display.value = currentNumber; 
+        }
+        
+        function getOperator(op) {
+            if (currentNumber !== '') {
+                if (previousNumber === null) {
+                    previousNumber = parseFloat(currentNumber); 
+                } else if (!newEntry) {
+                    previousNumber = calculate(previousNumber, parseFloat(currentNumber), operator); 
+                }
+            }
+            operator = op; 
+            newEntry = true; // Flag
+            display.value = previousNumber !== null ? previousNumber : ''; 
+        }
+        
+        function clearDisplay() {
+            currentNumber = '';
+            previousNumber = null;
+            operator = null;
+            newEntry = false;
+            display.value = '';
+        }
+        
+        function deleteLast() {
+            if (!newEntry) {
+                currentNumber = currentNumber.slice(0, -1);
+                display.value = currentNumber;
+            }
+        }
+        
+        function calculateResult() {
+            if (currentNumber !== '' && operator !== null) {
+                previousNumber = calculate(previousNumber, parseFloat(currentNumber), operator);
+                currentNumber = ''; 
+                operator = null; 
+                newEntry = true; 
+                display.value = previousNumber; 
+            }
+        }
+        
+        function calculate(num1, num2, op) {
+            switch (op) {
+                case '+':
+                    return num1 + num2;
+                case '-':
+                    return num1 - num2;
+                case '*':
+                    return num1 * num2;
+                case '/':
+                    return num2 !== 0 ? num1 / num2 : 'Error';
+                case '^':
+                    return Math.pow(num1, num2);
+                default:
+                    return num2;
+            }
+        }
+        
+        function insertPower() {
+            if (currentNumber !== '') {
+                getOperator('^');
+            }
+        }
+        
+        function insertSqrt() {
+            if (currentNumber !== '') {
+                const num = parseFloat(currentNumber);
+                if (num >= 0) {
+                    currentNumber = Math.sqrt(num).toString();
+                    display.value = currentNumber;
+                } else {
+                    display.value = 'Error';
+                    currentNumber = '';
+                }
+            }
+        }
+        
+        // Prevent invalid characters
+        display.addEventListener('input', () => {
+            const sanitizedValue = display.value.replace(/[^0-9.]/g, '');
+            currentNumber = sanitizedValue;
+            display.value = currentNumber;
+        });
+        
+        //keyboard input
+        document.addEventListener('keydown', (e) => {
+            const operators = {
+                '+': '+',
+                '-': '-',
+                '*': '*',
+                '/': '/',
+                '^': '^',
+            };
+        
+            if (!isNaN(e.key) || e.key === '.') {
+                //decimal points
+                if (newEntry) {
+                    currentNumber = e.key;
+                    newEntry = false;
+                } else {
+                    currentNumber += e.key; 
+                }
+                display.value = currentNumber;
+            } else if (operators[e.key]) {
+                e.preventDefault();
+                getOperator(operators[e.key]);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                calculateResult();
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                deleteLast();
+            }
+        });
+        </script>
+        
+</body>
+</html>
